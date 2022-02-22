@@ -37,13 +37,11 @@ class App extends Component {
   }
 
   async componentDidUpdate(prevState, prevProps) {
-    const { query } = prevState;    
     if (this.state.isPending) {
       const images = await imagesCard(this.state.query, this.state.page);
       this.setState(prevState => ({
         images: this.state.page > 1 ?[ ...prevState.images, ...images] : images,
         isPending: false,
-        page: this.state.query === query ? prevState.page + 1 : 1,
       }));
     }
   }
@@ -52,13 +50,13 @@ class App extends Component {
   render() {
     const { query,images,isModal,largeUrl,isPending } = this.state;
       return (
-        <>
+        <div className="box">
           <SearchBar onSubmit={this.handleSubmit} onChange={this.handleChange} value={query} />
           {!!images.length && <ImageGallery handleModal={this.handleModal} images={images} />}
           {!!images.lenght > 0 ? null : !isPending ? null : <Loader />}
           {!!images.length > 0 && <Button handleLoadMore={this.handleLoadMore}/>}
           {!!isModal && <Modal handleModal={this.handleModal} largeUrl={largeUrl}/>}
-        </>
+        </div>
     );
   };
 };
