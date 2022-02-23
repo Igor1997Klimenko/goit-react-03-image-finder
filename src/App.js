@@ -6,6 +6,8 @@ import ImageGallery from './ImageGallery/ImageGallery';
 import Modal from './Modal/Modal';
 import Button from './Button/Button';
 import Loader from './Loader/Loader';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 class App extends Component {
   state = {
     query: '',
@@ -19,6 +21,9 @@ class App extends Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     this.setState({ isPending: true, page: 1 });
+    if (this.state.query.trim() === '') {
+      toast.error("Error!");
+    }
   };
   
   handleChange = ({ target: { value, name } }) => {
@@ -33,14 +38,14 @@ class App extends Component {
   };
 
   handleLoadMore = () => {
-    this.setState(prevStage=>({page: prevStage.page + 1, isPending: true}))
+    this.setState(prevState=>({page: prevState.page + 1, isPending: true}))
   }
 
-  async componentDidUpdate(prevState, prevProps) {
+  async componentDidUpdate( prevProps,prevState) {
     if (this.state.isPending) {
       const images = await imagesCard(this.state.query, this.state.page);
-      this.setState(prevState => ({
-        images: this.state.page > 1 ?[ ...prevState.images, ...images] : images,
+      this.setState((prevState) => ({
+        images: this.state.page > 1 ? [...prevState.images, ...images] : images,
         isPending: false,
       }));
     }
@@ -52,6 +57,7 @@ class App extends Component {
       return (
         <div className="box">
           <SearchBar onSubmit={this.handleSubmit} onChange={this.handleChange} value={query} />
+          <ToastContainer />
           {!!images.length && <ImageGallery handleModal={this.handleModal} images={images} />}
           {!!images.lenght > 0 ? null : !isPending ? null : <Loader />}
           {!!images.length > 0 && <Button handleLoadMore={this.handleLoadMore}/>}
